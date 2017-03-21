@@ -1,21 +1,15 @@
-# grunt-debian-package 
+# debian-packager
 
-> Create debian package from grunt build
+> Create a Debian package from a directory
 
-Grunt plugin to create a Debian package, allowing JavaScript applications to be easily integration into a Debian or Ubuntu based continuous delivery pipeline.
+A Node script that creates a Debian package. Useful for packing up the distribution directory of a project after a build.
 
-[![Build Status](https://secure.travis-ci.org/jamesdbloom/grunt-debian-package.png?branch=master)](http://travis-ci.org/jamesdbloom/grunt-debian-package)  [![Dependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package.png)](https://david-dm.org/jamesdbloom/grunt-debian-package) [![devDependency Status](https://david-dm.org/jamesdbloom/grunt-debian-package/dev-status.png)](https://david-dm.org/jamesdbloom/grunt-debian-package#info=devDependencies) [![Code Climate](https://codeclimate.com/github/jamesdbloom/grunt-debian-package.png)](https://codeclimate.com/github/jamesdbloom/grunt-debian-package)
-
-
-[![NPM](https://nodei.co/npm/grunt-debian-package.png?downloads=true&stars=true)](https://nodei.co/npm/grunt-debian-package/) [![wercker status](https://app.wercker.com/status/1bd98ba2b740e62bf5f15cb335de7495/m "wercker status")](https://app.wercker.com/project/bykey/1bd98ba2b740e62bf5f15cb335de7495)
+This is a fork of [grunt-debian-package](https://github.com/jamesdbloom/grunt-debian-package) by [James Bloom](https://github.com/jamesdbloom), but with all the Grunt stuff removed.
 
 ## Getting Started
-This plugin requires Grunt `~0.4`
-
-If you haven't used [Grunt](http://gruntjs.com/) before, be sure to check out the [Getting Started](http://gruntjs.com/getting-started) guide, as it explains how to create a [Gruntfile](http://gruntjs.com/sample-gruntfile) as well as install and use Grunt plugins. Once you're familiar with that process, you may install this plugin with this command:
 
 ```shell
-npm install grunt-debian-package --save-dev
+npm install debian-packager --save-dev
 ```
 
 You will also need to install two debian tools used to create and lint the debian package, as follows:
@@ -24,35 +18,6 @@ You will also need to install two debian tools used to create and lint the debia
 sudo apt-get install devscripts
 sudo apt-get install debhelper
 ```
-
-Once the plugin has been installed, it may be enabled inside your Gruntfile with this line of JavaScript:
-
-```js
-grunt.loadNpmTasks('grunt-debian-package');
-```
-
-To print out verbose messages during packaging use --verbose, for example:
-
-```shell
-grunt debian_package --verbose
-```
-
-To debug any issues with the **debian_package** task configuration:
-
-**1.** use the node-inspector:
-
-```shell
-sudo npm install -g node-inspector
-node --debug-brk $(which grunt) debian_package --verbose
-```
-
-**2.** in another shell process:
-
-```shell
-node-inspector
-```
-
-**3.** open the url displayed in a browser
 
 ## The "debian_package" task
 
@@ -142,7 +107,7 @@ drwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/log/
 lrwxr-xr-x jenkins/jenkins         0 2014-04-27 15:08 ./var/log/tomcat7 -> package_name
 ```
 
-Using the `dpkg -I prefix-package_name-postfix-2.0.0-1.deb` command it is possible to see the package information: 
+Using the `dpkg -I prefix-package_name-postfix-2.0.0-1.deb` command it is possible to see the package information:
 
 ```shell
 dpkg -I prefix-package_name-postfix-2.0.0-1.deb
@@ -164,7 +129,7 @@ dpkg -I prefix-package_name-postfix-2.0.0-1.deb
 To install the package use: `sudo dpkg -i prefix-package_name-postfix-2.0.0-1.deb`
 
 ```shell
-sudo dpkg -i prefix-package_name-postfix-2.0.0-1.deb 
+sudo dpkg -i prefix-package_name-postfix-2.0.0-1.deb
 Selecting previously unselected package prefix-package_name-postfix.
 (Reading database ... 39938 files and directories currently installed.)
 Unpacking prefix-package_name-postfix (from package_name_2.0.0-1_i386.deb) ...
