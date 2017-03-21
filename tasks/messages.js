@@ -15,4 +15,4 @@ module.exports = {
 
     noLongDescription: 'No long description provided!!\n' +
         'Please add the \'long_description\' option in your debian_package configuration in package.json or add a multi line \'description\' field to package.json (note: the first line is used as the short description and the remaining lines are used as the long description)'
-}
+};
