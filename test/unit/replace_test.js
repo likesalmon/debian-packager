@@ -5,7 +5,8 @@ require('../../tasks/replace');
 
 var sinon = require('sinon'),
     testCase = require('nodeunit').testCase,
-    fs = require('fs-extra');
+    fs = require('fs-extra'),
+    tmpDir = 'test/unit/tmp';
 
 exports.replace_test = {
     'replaceAll string extension function': testCase({
@@ -46,11 +47,12 @@ exports.replace_test = {
         },
         tearDown: function (callback) {
             console.log.restore();
+            fs.removeSync(tmpDir);
             callback();
         },
         'replace string multiple times in single file': function (test) {
             // given
-            var path = "test/unit/tmp/test_file.txt",
+            var path = tmpDir + "/test_file.txt",
                 find = "text",
                 replace = "value",
                 expectedString = 'this is some value with the word value repeated in it again and again as value';
@@ -63,7 +65,7 @@ exports.replace_test = {
             // then
             test.deepEqual(fs.readFileSync(path, 'utf8'), expectedString, "File: " + path + " has not be correctly updated");
 
-            test.ok(console.log.calledWith('Replacing: \'value\' for \'text\' in test/unit/tmp/test_file.txt'));
+            test.ok(console.log.calledWith('Replacing: \'value\' for \'text\' in ' + tmpDir + '/test_file.txt'));
 
             // end
             test.done();
@@ -71,9 +73,9 @@ exports.replace_test = {
         'replace string multiple times in multiple files': function (test) {
             // given
             var paths = [
-                    "test/unit/tmp/test_file_one.txt",
-                    "test/unit/tmp/test_file_two.txt",
-                    "test/unit/tmp/test_file_three.txt"
+                    tmpDir + "/test_file_one.txt",
+                    tmpDir + "/test_file_two.txt",
+                    tmpDir + "/test_file_three.txt"
                 ],
                 i = 0,
                 find = "text",
@@ -92,7 +94,7 @@ exports.replace_test = {
                 test.deepEqual(fs.readFileSync(paths[i], 'utf8'), expectedString, "File: " + paths[i] + " has not be correctly updated");
             }
 
-            test.ok(console.log.calledWith('Replacing: \'value\' for \'text\' in test/unit/tmp/test_file_one.txt and test/unit/tmp/test_file_two.txt and test/unit/tmp/test_file_three.txt'));
+            test.ok(console.log.calledWith('Replacing: \'value\' for \'text\' in ' + tmpDir + '/test_file_one.txt and test/unit/tmp/test_file_two.txt and test/unit/tmp/test_file_three.txt'));
 
             // end
             test.done();
