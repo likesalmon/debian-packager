@@ -1,45 +1,57 @@
 {
-    "name": "grunt-debian-package",
-    "description": "Create debian package from grunt build",
-    "version": "0.1.12",
-    "homepage": "https://github.com/jamesdbloom/grunt-debian-package",
-    "author": {
-        "name": "James Bloom",
-        "email": "jamesdbloom@gmail.com",
-        "url": "http://blog.jamesdbloom.com"
-    },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/jamesdbloom/grunt-debian-package.git"
-    },
-    "bugs": {
-        "url": "https://github.com/jamesdbloom/grunt-debian-package/issues"
-    },
-    "license": "Apache-2.0",
-    "engines": {
-        "node": ">= 0.8.0"
-    },
-    "scripts": {
-        "test": "grunt travis"
-    },
-    "dependencies": {
-        "dateformat": "~1.0",
-        "node-spawn": "~0.0",
-        "replace": "~0.3"
-    },
-    "devDependencies": {
-        "grunt": ">=0.4",
-        "grunt-contrib-clean": "~1.0",
-        "grunt-contrib-jshint": "~0.11",
-        "grunt-contrib-nodeunit": "~1.0",
-        "grunt-run-node": "~0.1",
-        "nodeunit": "~0.9",
-        "sinon": "~1.13"
-    },
-    "peerDependencies": {
-        "grunt": ">=0.4"
-    },
-    "keywords": [
-        "gruntplugin"
-    ]
+  "name": "debian-packager",
+  "description": "Create a debian package from a directory.",
+  "version": "1.0.0",
+  "homepage": "https://github.com/likesalmon/debian-packager",
+  "author": {
+    "name": "Ammon Morris",
+    "email": "likesalmon@gmail.com",
+    "url": "http://likesalmon.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/likesalmon/debian-packager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/likesalmon/debian-packager/issues"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt travis"
+  },
+  "eslintConfig": {
+      "extends": "eslint:recommended",
+      "env": {
+          "node": true
+      },
+      "rules": {
+        "no-console": "off"
+      }
+  },
+  "dependencies": {
+    "dateformat": "~1.0",
+    "fs-extra": "^2.1.2",
+    "node-spawn": "~0.0",
+    "replace": "~0.3"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.42.0",
+    "grunt": ">=0.4",
+    "grunt-contrib-clean": "~1.0",
+    "grunt-contrib-jshint": "~0.11",
+    "grunt-contrib-nodeunit": "~1.0",
+    "grunt-run-node": "~0.1",
+    "nodeunit": "~0.9",
+    "sinon": "~1.13"
+  },
+  "peerDependencies": {
+    "grunt": ">=0.4"
+  },
+  "keywords": [
+    "nodejs",
+    "debian"
+  ]
 }
