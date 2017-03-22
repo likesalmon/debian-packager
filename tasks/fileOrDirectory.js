@@ -11,6 +11,12 @@ function _delete (path) {
     }
 }
 
+function _copy (source, dest) {
+    glob.sync(source).forEach(function (src) {
+        fs.copySync(src, dest);
+    });
+}
+
 function _cleanUp (options, allFiles) {
     if (allFiles) {
         _delete(options.working_directory);
@@ -27,6 +33,6 @@ function _cleanUp (options, allFiles) {
 
 module.exports = {
     _delete: _delete,
-    _copy: fs.copySync,
+    _copy: _copy,
     _cleanUp: _cleanUp
 };
