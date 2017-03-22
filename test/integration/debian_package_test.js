@@ -1,6 +1,7 @@
 'use strict';
 
-var grunt = require('grunt');
+var fs = require('fs-extra');
+var dircompare = require('dir-compare');
 
 function escapeRegExp(string) {
     return string.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
@@ -11,34 +12,43 @@ function replaceAll(string, find, replace) {
 }
 
 var compareDirectories = function (test, source, destination) {
-    grunt.file.recurse(source, function callback(abspath, rootdir, subdir, filename) {
-        if (abspath !== 'test/integration/default_options/packaging/debian/changelog' && abspath !== 'test/integration/custom_options/packaging/debian/changelog') {
+    var options = {
+        compareContent: true,
+        // exclude files that have template tokens like ${current_dir}
+        excludeFilter: 'changelog, Makefile'
+    };
 
-            var expected = replaceAll(grunt.file.read(abspath), '${current_dir}', process.cwd());
-            var message = '\n\n' +
-                'Comparing: \'' + abspath + '\' to \'' + destination + '/' + (subdir ? subdir + '/' : '') + filename +
-                '\'\n\n' +
-                'Expected:\n\'' +
-                '' + expected +
-                '\'\n\n' +
-                'But Found:\n\'' +
-                '' + grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename) + '\'';
-
-            test.equal(expected, grunt.file.read(destination + '/' + (subdir ? subdir + '/' : '') + filename), message);
-        }
-    });
-    test.done();
+    return dircompare.compare(source, destination, options)
+        .then(function (res) {
+            test.ok(res.same);
+            test.done();
+        });
 };
+
+function compareFiles (test, source, destination) {
+    var sourceContent = replaceAll(fs.readFileSync(source, 'utf8'), '${current_dir}', process.cwd());
+    var destContent = fs.readFileSync(destination, 'utf8');
+
+    test.equal(sourceContent, destContent);
+
+    test.done();
+}
+
 
 exports.debian_package = {
     setUp: function (done) {
-        // setup here if necessary
         done();
     },
     default_options: function (test) {
         compareDirectories(test, 'test/integration/default_options', 'tmp');
     },
+    default_options_makefile: function (test) {
+        compareFiles(test, 'test/integration/default_options/packaging/Makefile', 'tmp/packaging/Makefile');
+    },
     custom_options: function (test) {
         compareDirectories(test, 'test/integration/custom_options', 'test/integration/tmp');
+    },
+    custom_options_makefile: function (test) {
+        compareFiles(test, 'test/integration/custom_options/packaging/Makefile', 'test/integration/tmp/packaging/Makefile');
     }
 };
