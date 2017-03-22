@@ -1,13 +1,13 @@
 'use strict';
 
 var fs = require('fs-extra');
+var glob = require('glob');
 
 function _delete (path) {
-    try {
-        console.log('Deleting: \'' + path + '\'');
-        fs.removeSync(path);
-    } catch (e) {
-        // Fail silently
+    var results = glob.sync(path);
+    if (results.length > 0) {
+        console.log('Deleting: \'' + results + '\'');
+        results.forEach(fs.removeSync);
     }
 }
 
