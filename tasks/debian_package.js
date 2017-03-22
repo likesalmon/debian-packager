@@ -11,7 +11,7 @@ var fileSystem = require('./fileOrDirectory.js');
 var replace = require('./replace.js');
 var fs = require('fs-extra');
 var glob = require('glob');
-
+var R = require('ramda');
 
 
 var _validateOptions = require('./options.js')._validate,
@@ -39,27 +39,34 @@ function preparePackageContents (makefile, files, follow_soft_links, quiet) {
     });
 }
 
+function getOptions (pkg) {
+    var options = {
+        maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
+            name: process.env.DEBFULLNAME,
+            email: process.env.DEBEMAIL
+        } || pkg.author && pkg.author.name && pkg.author.email && pkg.author,
+        name: pkg.name,
+        prefix: "",
+        postfix: "",
+        short_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g)[0]) || '',
+        long_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
+        version: pkg.version,
+        build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
+        working_directory: 'tmp/',
+        packaging_directory_name: 'packaging',
+        target_architecture: "all",
+        category: "misc",
+        disable_debuild_deps_check: false
+    };
+
+    // Override options with pkg.debianPackagerConfig properties
+    return R.merge(options, R.propOr({}, 'debianPackagerConfig', pkg));
+}
+
 function init () {
     // Merge task-specific and/or target-specific options with these defaults.
-    var pkg = fs.readFileSync('package.json'),
-        options = this.options({
-            maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
-                name: process.env.DEBFULLNAME,
-                email: process.env.DEBEMAIL
-            } || pkg.author && pkg.author.name && pkg.author.email && pkg.author,
-            name: pkg.name,
-            prefix: "",
-            postfix: "",
-            short_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g)[0]) || '',
-            long_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
-            version: pkg.version,
-            build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
-            working_directory: 'tmp/',
-            packaging_directory_name: 'packaging',
-            target_architecture: "all",
-            category: "misc",
-            disable_debuild_deps_check: false
-        }),
+    var pkg = fs.readJsonSync('package.json'),
+        options = getOptions(pkg),
         spawn = require('child_process').spawn,
         dateFormat = require('dateformat'),
         now = dateFormat(new Date(), 'ddd, d mmm yyyy h:MM:ss +0000'),
@@ -110,7 +117,7 @@ function init () {
     _findAndReplace([control], '\\$\\{dependencies\\}', dependencies);
     _findAndReplace([control], '\\$\\{target_architecture\\}', options.target_architecture);
     _findAndReplace([control], '\\$\\{category\\}', options.category);
-    preparePackageContents(makefile, this.files, options.follow_soft_links, options.quiet);
+    preparePackageContents(makefile, options.files, options.follow_soft_links, options.quiet);
 
     // copy package lifecycle scripts
     var scripts = ['preinst', 'postinst', 'prerm', 'postrm'];
