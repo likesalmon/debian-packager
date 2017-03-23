@@ -31,6 +31,50 @@
       "no-console": "off"
     }
   },
+  "debianPackageOptions": {
+  "maintainer": {
+      "name": "James D Bloom",
+      "email": "jamesdbloom@email.com"
+  },
+  "prefix": "prefix-",
+  "name": "package_name",
+  "postfix": "-postfix",
+  "short_description": "the short description",
+  "long_description": "the long description added to the debian package",
+  "version": "2.0.0",
+  "build_number": "1",
+  "target_architecture": "amd64",
+  "category": "devel",
+  "links": [
+      {
+          "source": "/var/log/my-project",
+          "target": "/var/log/tomcat7"
+      },
+      {
+          "source": "/etc/init.d/my-project",
+          "target": "/etc/init.d/tomcat7"
+      }
+  ],
+  "directories": [
+      "/var/app/${name}"
+  ],
+  "dependencies": "couchdb, redis-server",
+  "files": [
+      {
+          "cwd": "build/",
+          "src": [
+              "**/*.js",
+              "**/*.html",
+              "**/*.css"
+          ],
+          "dest": "/var/www/"
+      },
+      {
+          "src":  "config/my-project.json",
+          "dest": "/var/www/my-project.json"
+      }
+  ]
+},
   "dependencies": {
     "dateformat": "~1.0",
     "fs-extra": "^2.1.2",
