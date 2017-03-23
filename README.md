@@ -1,6 +1,6 @@
 # debian-packager
 
-> Create a Debian package from a directory
+> Create a Debian package from a list of files
 
 A Node script that creates a Debian package. Useful for packing up the distribution directory of a project after a build.
 
@@ -19,63 +19,66 @@ sudo apt-get install devscripts
 sudo apt-get install debhelper
 ```
 
-## The "debian_package" task
+Configuration options are set in your **package.json** file. Most settings are pulled from standard properties (name, version), but you **must** provide a list of files in the `debianPackageOptions.files` property. See the below section for more on `debianPackageOptions`.
+
+## debianPackageOptions
 
 ### Overview
-In your project's Gruntfile, add a section named `debian_package` to the data object passed into `grunt.initConfig()`.
+In your project's **package.json**, add a section named `debianPackageOptions`.
 
-Typically the options section would not need to be provided as these values are read from the **package.json** file for the project.  In this example, however, custom options are used to override the default values.  For more details on the default values see below.
+Options provided in `debianPackageOptions` will override settings in the rest of **package.json** when creating your Debian package. For example, `debianPackageOptions.name` will be used in lieu of `name`.
+
+Typically the `debianPackageOptions` section would only need to provide a `files` list, as most values are read from elsewhere in **package.json**.  In this example, however, custom options are used to override the default values.  For more details on the default values see below.
 
 ```js
-grunt.initConfig({
-  debian_package: {
-    options: {
-        maintainer: {
-            name: "James D Bloom",
-            email: "jamesdbloom@email.com"
-        },
-        prefix: "prefix-",
-        name: "package_name",
-        postfix: "-postfix",
-        short_description: "the short description",
-        long_description: "the long description added to the debian package",
-        version: "2.0.0",
-        build_number: "1",
-        target_architecture: "amd64",
-        category: "devel",
-        links: [
-            {
-                source: '/var/log/${name}',
-                target: '/var/log/tomcat7'
-            },
-            {
-                source: '/etc/init.d/${name}',
-                target: '/etc/init.d/tomcat7'
-            }
-        ],
-        directories: [
-            '/var/app/${name}'
-        ],
-        dependencies: "couchdb, redis-server"
+{
+  "name": "my-project",
+  "version": "1.2.3",
+  "debianPackageOptions": {
+    "maintainer": {
+        "name": "James D Bloom",
+        "email": "jamesdbloom@email.com"
     },
-    files: [
+    "prefix": "prefix-",
+    "name": "package_name",
+    "postfix": "-postfix",
+    "short_description": "the short description",
+    "long_description": "the long description added to the debian package",
+    "version": "2.0.0",
+    "build_number": "1",
+    "target_architecture": "amd64",
+    "category": "devel",
+    "links": [
         {
-            expand: true,       // enable dynamic expansion
-            cwd: 'build/',      // src matches are relative to this path
-            src: [              // actual pattern(s) to match
-                '**/*.js',
-                '**/*.html',
-                '**/*.css'
-            ],
-            dest: '/var/www/'   // destination path prefix
+            "source": "/var/log/my-project",
+            "target": "/var/log/tomcat7"
         },
-        {                       // use template in file path
-            src:  'config/<%= grunt.package.name %>.json',
-            dest: '/var/www/<%= grunt.package.name %>.json'
+        {
+            "source": "/etc/init.d/my-project",
+            "target": "/etc/init.d/tomcat7"
+        }
+    ],
+    "directories": [
+        "/var/app/${name}"
+    ],
+    "dependencies": "couchdb, redis-server",
+    "files": [
+        {
+            "cwd": "build/",      // src matches are relative to this path
+            "src": [              // actual pattern(s) to match
+                "**/*.js",
+                "**/*.html",
+                "**/*.css"
+            ],
+            "dest": "/var/www/"   // destination path prefix
+        },
+        {
+            "src":  "config/my-project.json",
+            "dest": "/var/www/my-project.json"
         }
     ]
   }
-});
+}
 ```
 
 This will result in a package being created called **prefix-package_name-postfix-2.0.0-1.deb**.  The configuration above will result in the package containing all **\*.js**, **\*.css** and **\*.html** files in the **build** directory.  These files will be installed into **/var/wwww/** when the package is installed.  In addition the package will contain **/var/wwww/package_name.json** as a copy of the **config/package_name.json** file in the project.  The config above will also add two soft-links and an empty directory into the package.  Both the links and directories sections can use the following placeholders `${name}`, `${version}` and `${build_name}` to refer to the package name, version and build number respectively.
