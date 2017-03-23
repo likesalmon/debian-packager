@@ -1,7 +1,7 @@
 {
   "name": "debian-packager",
   "description": "Create a debian package from a directory.",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "homepage": "https://github.com/likesalmon/debian-packager",
   "author": {
     "name": "Ammon Morris",
@@ -13,7 +13,7 @@
     "url": "https://github.com/likesalmon/debian-packager.git"
   },
   "bin": {
-      "debian-packager": "bin/debian-packager"
+    "debian-packager": "bin/debian-packager"
   },
   "bugs": {
     "url": "https://github.com/likesalmon/debian-packager/issues"
