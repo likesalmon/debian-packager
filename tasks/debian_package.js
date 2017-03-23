@@ -11,7 +11,7 @@ var fileSystem = require('./fileOrDirectory.js');
 var replace = require('./replace.js');
 var fs = require('fs-extra');
 var glob = require('glob');
-var R = require('ramda');
+require('./object.assign.polyfill');
 
 
 var _validateOptions = require('./options.js')._validate,
@@ -39,18 +39,18 @@ function preparePackageContents (makefile, files, follow_soft_links, quiet) {
     });
 }
 
-function getOptions (pkg) {
+function getOptions (config) {
     var options = {
         maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
             name: process.env.DEBFULLNAME,
             email: process.env.DEBEMAIL
-        } || pkg.author && pkg.author.name && pkg.author.email && pkg.author,
-        name: pkg.name,
+        } || config.author && config.author.name && config.author.email && config.author,
+        name: config.name,
         prefix: "",
         postfix: "",
-        short_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g)[0]) || '',
-        long_description: (pkg.description && pkg.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
-        version: pkg.version,
+        short_description: (config.description && config.description.split(/\r\n|\r|\n/g)[0]) || '',
+        long_description: (config.description && config.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
+        version: config.version,
         build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
         working_directory: 'tmp/',
         packaging_directory_name: 'packaging',
@@ -59,14 +59,13 @@ function getOptions (pkg) {
         disable_debuild_deps_check: false
     };
 
-    // Override options with pkg.debianPackagerConfig properties
-    return R.merge(options, R.propOr({}, 'debianPackagerConfig', pkg));
+    // Override options with config.debianPackagerConfig properties
+    return Object.assign(options, config.debianPackagerConfig);
 }
 
-function init () {
+function create (config) {
     // Merge task-specific and/or target-specific options with these defaults.
-    var pkg = fs.readJsonSync('package.json'),
-        options = getOptions(pkg),
+    var options = getOptions(config),
         spawn = require('child_process').spawn,
         dateFormat = require('dateformat'),
         now = dateFormat(new Date(), 'ddd, d mmm yyyy h:MM:ss +0000'),
@@ -190,4 +189,6 @@ function init () {
     });
 }
 
-init();
+module.exports = {
+  create: create
+};
