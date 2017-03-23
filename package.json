@@ -1,102 +1,103 @@
 {
-    "name": "debian-packager",
-    "description": "Create a debian package from a directory.",
-    "version": "1.0.0",
-    "homepage": "https://github.com/likesalmon/debian-packager",
-    "author": {
-        "name": "Ammon Morris",
-        "email": "likesalmon@gmail.com",
-        "url": "http://likesalmon.net"
+  "name": "debian-packager",
+  "description": "Create a debian package from a directory.",
+  "version": "1.0.0",
+  "homepage": "https://github.com/likesalmon/debian-packager",
+  "author": {
+    "name": "Ammon Morris",
+    "email": "likesalmon@gmail.com",
+    "url": "http://likesalmon.net"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/likesalmon/debian-packager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/likesalmon/debian-packager/issues"
+  },
+  "license": "Apache-2.0",
+  "engines": {
+    "node": ">= 0.8.0"
+  },
+  "scripts": {
+    "test": "grunt travis"
+  },
+  "eslintConfig": {
+    "extends": "eslint:recommended",
+    "env": {
+      "node": true
     },
-    "repository": {
-        "type": "git",
-        "url": "https://github.com/likesalmon/debian-packager.git"
+    "rules": {
+      "no-console": "off"
+    }
+  },
+  "debianPackageOptions": {
+    "maintainer": {
+      "name": "James D Bloom",
+      "email": "jamesdbloom@email.com"
     },
-    "bugs": {
-        "url": "https://github.com/likesalmon/debian-packager/issues"
-    },
-    "license": "Apache-2.0",
-    "engines": {
-        "node": ">= 0.8.0"
-    },
-    "scripts": {
-        "test": "grunt travis"
-    },
-    "eslintConfig": {
-        "extends": "eslint:recommended",
-        "env": {
-            "node": true
-        },
-        "rules": {
-            "no-console": "off"
-        }
-    },
-    "debianPackageOptions": {
-        "maintainer": {
-            "name": "James D Bloom",
-            "email": "jamesdbloom@email.com"
-        },
-        "prefix": "prefix-",
-        "name": "package_name",
-        "postfix": "-postfix",
-        "short_description": "the short description",
-        "long_description": "the long description added to the debian package",
-        "version": "2.0.0",
-        "build_number": "1",
-        "target_architecture": "amd64",
-        "category": "devel",
-        "links": [{
-                "source": "/var/log/my-project",
-                "target": "/var/log/tomcat7"
-            },
-            {
-                "source": "/etc/init.d/my-project",
-                "target": "/etc/init.d/tomcat7"
-            }
+    "prefix": "prefix-",
+    "name": "package_name",
+    "postfix": "-postfix",
+    "short_description": "the short description",
+    "long_description": "the long description added to the debian package",
+    "version": "2.0.0",
+    "build_number": "1",
+    "target_architecture": "amd64",
+    "category": "devel",
+    "links": [
+      {
+        "source": "/var/log/my-project",
+        "target": "/var/log/tomcat7"
+      },
+      {
+        "source": "/etc/init.d/my-project",
+        "target": "/etc/init.d/tomcat7"
+      }
+    ],
+    "directories": [
+      "/var/app/${name}"
+    ],
+    "dependencies": "couchdb, redis-server",
+    "files": [
+      {
+        "cwd": "build/",
+        "src": [
+          "**/*.js",
+          "**/*.html",
+          "**/*.css"
         ],
-        "directories": [
-            "/var/app/${name}"
-        ],
-        "dependencies": "couchdb, redis-server",
-        "files": [{
-                "cwd": "build/",
-                "src": [
-                    "**/*.js",
-                    "**/*.html",
-                    "**/*.css"
-                ],
-                "dest": "/var/www/"
-            },
-            {
-                "src": "config/my-project.json",
-                "dest": "/var/www/my-project.json"
-            }
-        ]
-    },
-    "dependencies": {
-        "dateformat": "~1.0",
-        "fs-extra": "^2.1.2",
-        "node-glob": "^1.2.0",
-        "node-spawn": "~0.0",
-        "ramda": "^0.23.0",
-        "replace": "~0.3"
-    },
-    "devDependencies": {
-        "dir-compare": "^1.3.0",
-        "flow-bin": "^0.42.0",
-        "grunt": ">=0.4",
-        "grunt-contrib-clean": "~1.0",
-        "grunt-contrib-jshint": "~0.11",
-        "grunt-contrib-nodeunit": "~1.0",
-        "grunt-run-node": "~0.1",
-        "nodeunit": "~0.9",
-        "sinon": "~1.13"
-    },
-    "peerDependencies": {
-        "grunt": ">=0.4"
-    },
-    "keywords": [
-        "nodejs",
-        "debian"
+        "dest": "/var/www/"
+      },
+      {
+        "src": "config/my-project.json",
+        "dest": "/var/www/my-project.json"
+      }
     ]
+  },
+  "dependencies": {
+    "dateformat": "~1.0",
+    "fs-extra": "^2.1.2",
+    "node-glob": "^1.2.0",
+    "node-spawn": "~0.0",
+    "ramda": "^0.23.0",
+    "replace": "~0.3"
+  },
+  "devDependencies": {
+    "dir-compare": "^1.3.0",
+    "grunt": ">=0.4",
+    "grunt-contrib-clean": "~1.0",
+    "grunt-contrib-jshint": "~0.11",
+    "grunt-contrib-nodeunit": "~1.0",
+    "grunt-run-node": "~0.1",
+    "nodeunit": "~0.9",
+    "sinon": "~1.13"
+  },
+  "peerDependencies": {
+    "grunt": ">=0.4"
+  },
+  "keywords": [
+    "nodejs",
+    "debian"
+  ]
 }
