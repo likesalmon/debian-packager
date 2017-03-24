@@ -23,7 +23,8 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "test": "grunt travis"
+    "start": "./bin/debian-packager",
+    "test": "./node_modules/.bin/nodeunit"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
@@ -34,7 +35,7 @@
       "no-console": "off"
     }
   },
-  "debianPackageOptions": {
+  "debianPackagerOptions": {
     "maintainer": {
       "name": "James D Bloom",
       "email": "jamesdbloom@email.com"
@@ -84,6 +85,7 @@
     "fs-extra": "^2.1.2",
     "glob": "^7.1.1",
     "node-spawn": "~0.0",
+    "ramda": "^0.23.0",
     "replace": "~0.3"
   },
   "devDependencies": {
