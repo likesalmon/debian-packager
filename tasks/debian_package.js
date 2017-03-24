@@ -11,10 +11,13 @@ var fileSystem = require('./fileOrDirectory.js');
 var replace = require('./replace.js');
 var fs = require('fs-extra');
 var glob = require('glob');
-require('./object.assign.polyfill');
+var options = require('./options');
+var messages = require('./messages');
 
 
-var _validateOptions = require('./options.js')._validate,
+
+var _validateOptions = options._validate,
+    _mergeOptions = options._merge,
     _copy = fileSystem._copy,
     _cleanUp = fileSystem._cleanUp,
     _findAndReplace = replace._findAndReplace,
@@ -39,37 +42,13 @@ function preparePackageContents (makefile, files, follow_soft_links, quiet) {
     });
 }
 
-function getOptions (config) {
-    var options = {
-        maintainer: process.env.DEBFULLNAME && process.env.DEBEMAIL && {
-            name: process.env.DEBFULLNAME,
-            email: process.env.DEBEMAIL
-        } || config.author && config.author.name && config.author.email && config.author,
-        name: config.name,
-        prefix: "",
-        postfix: "",
-        short_description: (config.description && config.description.split(/\r\n|\r|\n/g)[0]) || '',
-        long_description: (config.description && config.description.split(/\r\n|\r|\n/g).splice(1).join(' ')) || '',
-        version: config.version,
-        build_number: process.env.BUILD_NUMBER || process.env.DRONE_BUILD_NUMBER || process.env.TRAVIS_BUILD_NUMBER || '1',
-        working_directory: 'tmp/',
-        packaging_directory_name: 'packaging',
-        target_architecture: "all",
-        category: "misc",
-        disable_debuild_deps_check: false
-    };
-
-    // Override options with config.debianPackagerConfig properties
-    return Object.assign(options, config.debianPackagerConfig);
-}
-
 function create (config) {
     // Merge task-specific and/or target-specific options with these defaults.
-    var options = getOptions(config),
+    var settings = _mergeOptions(config),
         spawn = require('child_process').spawn,
         dateFormat = require('dateformat'),
         now = dateFormat(new Date(), 'ddd, d mmm yyyy h:MM:ss +0000'),
-        temp_directory = options.working_directory + options.packaging_directory_name,
+        temp_directory = settings.working_directory + settings.packaging_directory_name,
         controlDirectory = temp_directory + '/debian',
         changelog = controlDirectory + '/changelog',
         control = controlDirectory + '/control',
@@ -78,56 +57,62 @@ function create (config) {
         makefile = temp_directory + '/Makefile',
         dependencies = '';
 
-    // Quit if options are invalid
-    if (!_validateOptions(options, options.quiet)) {
+    if (!settings) {
+        console.error(messages.providePackageJson, '\n');
         return;
     }
 
-    _cleanUp(options, true);
-    _copy(__dirname + '/../' + options.packaging_directory_name, temp_directory);
+    // Quit if settings are invalid
+    if (!_validateOptions(settings, settings.quiet)) {
+        console.error(messages.invalidOptions, '\n');
+        return;
+    }
 
-    if (options.custom_template) {
-        _copy(options.custom_template, temp_directory);
+    _cleanUp(settings, true);
+    _copy(__dirname + '/../' + settings.packaging_directory_name, temp_directory);
+
+    if (settings.custom_template) {
+        _copy(settings.custom_template, temp_directory);
     }
 
     // set environment variables if they are not already set
-    process.env.DEBFULLNAME = options.maintainer.name;
-    process.env.DEBEMAIL = options.maintainer.email;
+    process.env.DEBFULLNAME = settings.maintainer.name;
+    process.env.DEBEMAIL = settings.maintainer.email;
 
-    if (options.dependencies) {
-        dependencies = ', ' + options.dependencies;
+    if (settings.dependencies) {
+        dependencies = ', ' + settings.dependencies;
     }
 
     // generate packaging control files
-    _transformAndReplace([links], '\\$\\{softlinks\\}', options.links || [], function (softlink) {
+    _transformAndReplace([links], '\\$\\{softlinks\\}', settings.links || [], function (softlink) {
         return softlink.target + '       ' + softlink.source + '\n';
     });
-    _transformAndReplace([dirs], '\\$\\{directories\\}', options.directories || [], function (directory) {
+    _transformAndReplace([dirs], '\\$\\{directories\\}', settings.directories || [], function (directory) {
         return directory + '\n';
     });
-    _findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', options.maintainer.name);
-    _findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', options.maintainer.email);
+    _findAndReplace([changelog, control], '\\$\\{maintainer.name\\}', settings.maintainer.name);
+    _findAndReplace([changelog, control], '\\$\\{maintainer.email\\}', settings.maintainer.email);
     _findAndReplace([changelog], '\\$\\{date\\}', now);
-    _findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', options.package_name);
-    _findAndReplace([control], '\\$\\{short_description\\}', options.short_description);
-    _findAndReplace([control], '\\$\\{long_description\\}', options.long_description);
-    _findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', options.version);
-    _findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', options.build_number);
+    _findAndReplace([changelog, control, links, dirs], '\\$\\{name\\}', settings.package_name);
+    _findAndReplace([control], '\\$\\{short_description\\}', settings.short_description);
+    _findAndReplace([control], '\\$\\{long_description\\}', settings.long_description);
+    _findAndReplace([changelog, control, links, dirs], '\\$\\{version\\}', settings.version);
+    _findAndReplace([changelog, control, links, dirs], '\\$\\{build_number\\}', settings.build_number);
     _findAndReplace([control], '\\$\\{dependencies\\}', dependencies);
-    _findAndReplace([control], '\\$\\{target_architecture\\}', options.target_architecture);
-    _findAndReplace([control], '\\$\\{category\\}', options.category);
-    preparePackageContents(makefile, options.files, options.follow_soft_links, options.quiet);
+    _findAndReplace([control], '\\$\\{target_architecture\\}', settings.target_architecture);
+    _findAndReplace([control], '\\$\\{category\\}', settings.category);
+    preparePackageContents(makefile, settings.files, settings.follow_soft_links, settings.quiet);
 
     // copy package lifecycle scripts
     var scripts = ['preinst', 'postinst', 'prerm', 'postrm'];
     for (var i = 0; i < scripts.length; i++) {
-        if (options[scripts[i]]) {
+        if (settings[scripts[i]]) {
             var destination = controlDirectory + '/' + scripts[i];
-            console.log(JSON.stringify(options[scripts[i]]));
-            if (options[scripts[i]].src) {
-                fs.copySync(options[scripts[i]].src, destination);
-            } else if (options[scripts[i]].contents) {
-                fs.writeFileSync(destination, options[scripts[i]].contents);
+            console.log(JSON.stringify(settings[scripts[i]]));
+            if (settings[scripts[i]].src) {
+                fs.copySync(settings[scripts[i]].src, destination);
+            } else if (settings[scripts[i]].contents) {
+                fs.writeFileSync(destination, settings[scripts[i]].contents);
             }
         }
     }
@@ -136,7 +121,7 @@ function create (config) {
     console.log('Running \'debuild --no-tgz-check -sa -us -uc --lintian-opts --suppress-tags tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www\'');
 
     // Stop here on a dry-run
-    if (options.simulate) {
+    if (settings.simulate) {
         return;
     }
 
@@ -144,32 +129,32 @@ function create (config) {
     try {
         fs.accessSync('/usr/bin/debuild');
     } catch (e) {
-        _cleanUp(options);
+        _cleanUp(settings);
         console.error('\n\'debuild\' executable not found!!');
         console.warn('To install debuild try running \'sudo apt-get install devscripts\'');
         return;
     }
 
 
-    var checkDeps = options.disable_debuild_deps_check ? "-d" : "-D";
+    var checkDeps = settings.disable_debuild_deps_check ? "-d" : "-D";
     var debuild = spawn('debuild', ['--no-tgz-check', '-sa', checkDeps, '-us', '-uc', '--lintian-opts', '--suppress-tags', 'tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www'], {
         cwd: temp_directory,
         stdio: [ 'ignore', process.stdout, process.stderr ]
     });
     debuild.on('exit', function (code) {
         if (code !== 0) {
-            var logFile = fs.readFileSync(glob.sync(options.package_location + '*.build')[0]);
+            var logFile = fs.readFileSync(glob.sync(settings.package_location + '*.build')[0]);
             console.error('Error running debuild!!');
             if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper") !== -1) {
                 console.warn('`debhelper` dependency not found. try running \'sudo apt-get install debhelper\'');
             }
         } else {
-            _cleanUp(options);
-            console.log('Created package: ' + glob.sync(options.package_location + '*.build')[0]);
-            if (options.repository) {
-                console.log('Running \'dput ' + options.repository + ' ' + glob.sync(options.package_location + '*.changes')[0] + '\'');
-                require('fs').chmodSync("" + glob.sync(options.package_location + '*.changes')[0], "744");
-                var dputArguments = [options.repository, glob.sync(options.package_location + '*.changes')[0]];
+            _cleanUp(settings);
+            console.log('Created package: ' + glob.sync(settings.package_location + '*.build')[0]);
+            if (settings.repository) {
+                console.log('Running \'dput ' + settings.repository + ' ' + glob.sync(settings.package_location + '*.changes')[0] + '\'');
+                require('fs').chmodSync("" + glob.sync(settings.package_location + '*.changes')[0], "744");
+                var dputArguments = [settings.repository, glob.sync(settings.package_location + '*.changes')[0]];
 
                 // Activate debug mode
                 dputArguments.unshift('-d');
@@ -181,7 +166,7 @@ function create (config) {
                     if (code !== 0) {
                         console.error('Error uploading package using dput!!');
                     } else {
-                        console.log('Uploaded package: ' + glob.sync(options.package_location + '*.deb')[0]);
+                        console.log('Uploaded package: ' + glob.sync(settings.package_location + '*.deb')[0]);
                     }
                 });
             }
