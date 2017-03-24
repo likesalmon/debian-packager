@@ -23,8 +23,9 @@
     "node": ">= 0.8.0"
   },
   "scripts": {
-    "start": "./bin/debian-packager",
-    "test": "./node_modules/.bin/nodeunit"
+    "start": "./bin/debian-packager package.json",
+    "test": "./node_modules/.bin/nodeunit test/unit",
+    "test:integration": "./node_modules/.bin/nodeunit test/integration"
   },
   "eslintConfig": {
     "extends": "eslint:recommended",
