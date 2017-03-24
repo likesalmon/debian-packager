@@ -14,5 +14,11 @@ module.exports = {
         'Please add the \'maintainer.email\' option in your debian_package configuration in package.json or add a \'DEBEMAIL\' environment variable (i.e. export DEBEMAIL="jamesdbloom@email.com")',
 
     noLongDescription: 'No long description provided!!\n' +
-        'Please add the \'long_description\' option in your debian_package configuration in package.json or add a multi line \'description\' field to package.json (note: the first line is used as the short description and the remaining lines are used as the long description)'
+        'Please add the \'long_description\' option in your debian_package configuration in package.json or add a multi line \'description\' field to package.json (note: the first line is used as the short description and the remaining lines are used as the long description)',
+
+    providePackageJson: 'Please provide a valid package.json file.',
+
+    provideConfig: 'Please provide a config file with `debian-packager package.json`',
+
+    invalidOptions: 'Sorry, I can\'t create a package with invalid options.'
 };

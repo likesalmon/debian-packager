@@ -4,11 +4,12 @@
 
 var debianPackager = require('../tasks/debian_package.js');
 var fs = require('fs-extra');
+var messages = require('../tasks/messages');
 
 var config = process.argv[2];
 
 if (!config) {
-    return console.error('Please provide a config file like: `debian_package package.json`');
+    return console.error(messages.provideConfig);
 }
 
 fs.readJson(config, function (err, config) {
