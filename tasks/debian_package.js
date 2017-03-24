@@ -118,7 +118,7 @@ function create (config) {
     }
 
     // run packaging binaries (i.e. build process)
-    console.log('Running \'debuild --no-tgz-check -sa -us -uc --lintian-opts --suppress-tags tar-errors-from-data,tar-errors-from-control,dir-or-file-in-var-www\'');
+    console.log(messages.runningDebuild, '\n');
 
     // Stop here on a dry-run
     if (settings.simulate) {
@@ -130,8 +130,7 @@ function create (config) {
         fs.accessSync('/usr/bin/debuild');
     } catch (e) {
         _cleanUp(settings);
-        console.error('\n\'debuild\' executable not found!!');
-        console.warn('To install debuild try running \'sudo apt-get install devscripts\'');
+        console.error(messages.debuildNotFound);
         return;
     }
 
@@ -144,9 +143,9 @@ function create (config) {
     debuild.on('exit', function (code) {
         if (code !== 0) {
             var logFile = fs.readFileSync(glob.sync(settings.package_location + '*.build')[0]);
-            console.error('Error running debuild!!');
+            console.error(messages.debuilError);
             if (logFile.search("Unmet\\sbuild\\sdependencies\\:\\sdebhelper") !== -1) {
-                console.warn('`debhelper` dependency not found. try running \'sudo apt-get install debhelper\'');
+                console.warn(messages.debhelperNotFound);
             }
         } else {
             _cleanUp(settings);
@@ -164,7 +163,7 @@ function create (config) {
                 });
                 dput.on('exit', function (code) {
                     if (code !== 0) {
-                        console.error('Error uploading package using dput!!');
+                        console.error(messages.dputError);
                     } else {
                         console.log('Uploaded package: ' + glob.sync(settings.package_location + '*.deb')[0]);
                     }
