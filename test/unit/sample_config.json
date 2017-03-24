@@ -1,0 +1,38 @@
+{
+    "author": {
+        "name": "Jane Doe",
+        "email": "jane@doe.com"
+    },
+    "name": "my-project",
+    "description": "This is the short description. \nThis will be included in the long description.",
+    "version": "1.0.0",
+    "debianPackagerConfig": {
+        "maintainer": {
+            "name": "Jayne Doh",
+            "email": "jayne@doh.com"
+        },
+        "name": "your-project",
+        "version": "2.0.0",
+        "prefix": "the-prefix",
+        "postfix": "this-postfix",
+        "short_description": "Short.",
+        "long_description": "Long.",
+        "working_directory": "var/",
+        "packaging_directory_name": "my-package",
+        "target_architecture": "amd64",
+        "category": "nodejs",
+        "disable_debuild_deps_check": true,
+        "files" : [
+            {
+                "cwd": "build/",
+                "src": [
+                    "**/*.js", "**/*.html", "**/*.css"
+                ],
+                "dest": "/var/www/"
+            }, {
+                "src": "config/my-project.json",
+                "dest": "/var/www/my-project.json"
+            }
+        ]
+    }
+}
