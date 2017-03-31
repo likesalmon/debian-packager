@@ -43,11 +43,11 @@ function _merge (config) {
         disable_debuild_deps_check: false
     };
 
-    // Override defaultOptions with config.debianPackagerConfig properties
-    // return R.merge(defaultOptions, settings || {}, config.debianPackagerConfig);
+    // Override defaultOptions with config.debianPackagerOptions properties
+    // return R.merge(defaultOptions, settings || {}, config.debianPackagerOptions);
     return R.pipe(
         R.merge(R.__, settings),
-        R.merge(R.__, config.debianPackagerConfig)
+        R.merge(R.__, config.debianPackagerOptions)
     )(defaultOptions);
 }
 

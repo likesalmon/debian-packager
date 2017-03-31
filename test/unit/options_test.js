@@ -51,7 +51,7 @@ exports.options_test = {
             test.done();
         },
         'should override default options with package.json props': function (test) {
-            delete this.config.debianPackagerConfig;
+            delete this.config.debianPackagerOptions;
             var results = this._mergeOptions(this.config);
 
             test.deepEqual(results.maintainer, {
@@ -78,9 +78,9 @@ exports.options_test = {
         //
         //     test.done();
         // },
-        'should override package.json props with debianPackagerConfig props': function (test) {
+        'should override package.json props with debianPackagerOptions props': function (test) {
             var results = this._mergeOptions(this.config);
-            var overrides = this.config.debianPackagerConfig;
+            var overrides = this.config.debianPackagerOptions;
 
             test.deepEqual(results.maintainer, {
                 name: overrides.maintainer.name,
