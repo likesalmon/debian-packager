@@ -66,7 +66,7 @@
     "dependencies": "couchdb, redis-server",
     "files": [
       {
-        "cwd": "build/",
+        "cwd": "test/sample-project",
         "src": [
           "**/*.js",
           "**/*.html",
@@ -75,7 +75,7 @@
         "dest": "/var/www/"
       },
       {
-        "src": "config/my-project.json",
+        "src": ["package.json"],
         "dest": "/var/www/my-project.json"
       }
     ]
