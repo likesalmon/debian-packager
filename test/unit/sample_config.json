@@ -6,7 +6,7 @@
     "name": "my-project",
     "description": "This is the short description. \nThis will be included in the long description.",
     "version": "1.0.0",
-    "debianPackagerConfig": {
+    "debianPackagerOptions": {
         "maintainer": {
             "name": "Jayne Doh",
             "email": "jayne@doh.com"
