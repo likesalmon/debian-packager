@@ -13,7 +13,7 @@ var fs = require('fs-extra');
 var glob = require('glob');
 var options = require('./options');
 var messages = require('./messages');
-
+var path = require('path');
 
 
 var _validateOptions = options._validate,
@@ -25,10 +25,12 @@ var _validateOptions = options._validate,
 
 function preparePackageContents (makefile, files, follow_soft_links, quiet) {
     _transformAndReplace([makefile], '\\$\\{file_list\\}', files, function (file) {
-        return file.src.filter(function (filepath) {
+        return file.src.map(function (src) {
+          return glob.sync(path.join(file.cwd || '', src))[0];
+        }).filter(function (filepath) {
             try {
                 var stats = fs.statSync(filepath);
-                return stats.isDirectory();
+                return stats.isFile();
             } catch (err) {
                 console.warn('File \'' + filepath + '\' not found');
                 return false;
@@ -149,7 +151,7 @@ function create (config) {
             }
         } else {
             _cleanUp(settings);
-            console.log('Created package: ' + glob.sync(settings.package_location + '*.build')[0]);
+            console.log('Created package: ' + glob.sync(settings.package_location + '*.deb'));
             if (settings.repository) {
                 console.log('Running \'dput ' + settings.repository + ' ' + glob.sync(settings.package_location + '*.changes')[0] + '\'');
                 require('fs').chmodSync("" + glob.sync(settings.package_location + '*.changes')[0], "744");
