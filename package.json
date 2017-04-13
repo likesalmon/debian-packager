@@ -98,9 +98,6 @@
     "nodeunit": "~0.9",
     "sinon": "~1.13"
   },
-  "peerDependencies": {
-    "grunt": ">=0.4"
-  },
   "keywords": [
     "nodejs",
     "debian"
