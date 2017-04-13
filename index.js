@@ -7,7 +7,7 @@ var messages = require('./tasks/messages');
 var config = process.argv[2];
 
 if (!config) {
-    return console.error(messages.provideConfig);
+    throw new Error(messages.provideConfig);
 }
 
 fs.readJson(config, function (err, config) {
