@@ -25,9 +25,11 @@ var _validateOptions = options._validate,
 
 function preparePackageContents (makefile, files, follow_soft_links, quiet) {
     _transformAndReplace([makefile], '\\$\\{file_list\\}', files, function (file) {
-        return file.src.map(function (src) {
-          return glob.sync(path.join(file.cwd || '', src))[0];
-        }).filter(function (filepath) {
+        return [].concat.apply([], 
+            file.src.map(function (src) {
+                return glob.sync(path.join(file.cwd || '', src));
+            })
+        ).filter(function (filepath) {
             try {
                 var stats = fs.statSync(filepath);
                 return stats.isFile();
