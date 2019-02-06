@@ -87,7 +87,7 @@
     "glob": "^7.1.1",
     "node-spawn": "~0.0",
     "ramda": "^0.23.0",
-    "replace": "~0.3"
+    "replace": "^1.0.1"
   },
   "devDependencies": {
     "grunt": ">=0.4",
